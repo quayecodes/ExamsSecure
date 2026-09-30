@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  LECTURER
+  STUDENT
+}
+
+enum QuestionType {
+  MCQ
+  TRUE_FALSE
+  SHORT_ANSWER
+}
+
+enum ExamStatus {
+  DRAFT
+  SCHEDULED
+  ACTIVE
+  CLOSED
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  AUTO_SUBMITTED
+  GRADED
+}
+
+model Institution {
+  id      String   @id @default(uuid())
+  name    String
+  users   User[]
+  courses Course[]
+}
+
+model User {
+  id            String       @id @default(uuid())
+  institutionId String
+  institution   Institution  @relation(fields: [institutionId], references: [id])
+  email         String       @unique
+  passwordHash  String
+  role          Role
+  fullName      String
+  createdAt     DateTime     @default(now())
+  coursesTaught Course[]     @relation("LecturerCourses")
+  attempts      ExamAttempt[]
+}
+
+model Course {
+  id            String        @id @default(uuid())
+  institutionId String
+  institution   Institution   @relation(fields: [institutionId], references: [id])
+  lecturerId    String
+  lecturer      User          @relation("LecturerCourses", fields: [lecturerId], references: [id])
+  name          String
+  questionBanks QuestionBank[]
+  exams         Exam[]
+}
+
+model QuestionBank {
+  id        String    @id @default(uuid())
+  courseId  String
+  course    Course    @relation(fields: [courseId], references: [id])
+  title     String
+  questions Question[]
+}
+
+model Question {
+  id             String         @id @default(uuid())
+  questionBankId String
+  questionBank   QuestionBank   @relation(fields: [questionBankId], references: [id])
+  type           QuestionType
+  prompt         String
+  points         Int            @default(1)
+  correctAnswer  String?
+  options        QuestionOption[]
+  examLinks      ExamQuestion[]
+  responses      AnswerResponse[]
+}
+
+model QuestionOption {
+  id         String   @id @default(uuid())
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id])
+  optionText String
+  isCorrect  Boolean  @default(false)
+}
+
+model Exam {
+  id                 String       @id @default(uuid())
+  courseId           String
+  course             Course       @relation(fields: [courseId], references: [id])
+  title              String
+  durationMinutes    Int
+  windowStart        DateTime
+  windowEnd          DateTime
+  randomizeQuestions Boolean      @default(true)
+  status             ExamStatus   @default(DRAFT)
+  questions          ExamQuestion[]
+  attempts           ExamAttempt[]
+}
+
+model ExamQuestion {
+  id             String   @id @default(uuid())
+  examId         String
+  exam           Exam     @relation(fields: [examId], references: [id])
+  questionId     String
+  question       Question @relation(fields: [questionId], references: [id])
+  orderIndex     Int
+  pointsOverride Int?
+}
+
+model ExamAttempt {
+  id             String         @id @default(uuid())
+  examId         String
+  exam           Exam           @relation(fields: [examId], references: [id])
+  studentId      String
+  student        User           @relation(fields: [studentId], references: [id])
+  startedAt      DateTime
+  submittedAt    DateTime?
+  status         AttemptStatus  @default(IN_PROGRESS)
+  score          Decimal?
+  responses      AnswerResponse[]
+  integrityEvents IntegrityEvent[]
+
+  @@unique([examId, studentId])
+  @@index([examId, status])
+}
+
+model AnswerResponse {
+  id               String      @id @default(uuid())
+  attemptId        String
+  attempt          ExamAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId       String
+  question         Question    @relation(fields: [questionId], references: [id])
+  selectedOptionId String?
+  answerText       String?
+  isCorrect        Boolean?
+  pointsAwarded    Decimal?
+
+  @@index([attemptId])
+}
+
+model IntegrityEvent {
+  id         String      @id @default(uuid())
+  attemptId  String
+  attempt    ExamAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  eventType  String
+  occurredAt DateTime
+}
