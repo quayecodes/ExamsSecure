@@ -27,25 +27,28 @@ export async function POST(request: Request) {
 
   const passwordHash = await bcrypt.hash(parsed.data.password, 12);
 
-  await prisma.$transaction(async (transaction) => {
-    const institution =
-      (await transaction.institution.findFirst({
-        where: { name: parsed.data.institutionName },
-      })) ??
-      (await transaction.institution.create({
-        data: { name: parsed.data.institutionName },
-      }));
+  await prisma.$transaction(
+    async (transaction) => {
+      const institution =
+        (await transaction.institution.findFirst({
+          where: { name: parsed.data.institutionName },
+        })) ??
+        (await transaction.institution.create({
+          data: { name: parsed.data.institutionName },
+        }));
 
-    await transaction.user.create({
-      data: {
-        fullName: parsed.data.fullName,
-        email,
-        passwordHash,
-        role: "STUDENT",
-        institutionId: institution.id,
-      },
-    });
-  });
+      await transaction.user.create({
+        data: {
+          fullName: parsed.data.fullName,
+          email,
+          passwordHash,
+          role: "STUDENT",
+          institutionId: institution.id,
+        },
+      });
+    },
+    { maxWait: 10000, timeout: 15000 },
+  );
 
   return NextResponse.json({ message: "Account created. You can now sign in." }, { status: 201 });
 }
