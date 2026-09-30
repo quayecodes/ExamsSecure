@@ -484,7 +484,7 @@ model IntegrityEvent {
 ---
 
 COMPLETED: Phases 1–3 (Requirements, Architecture, Database Design)
-FILES CHANGED: `examsecure-phase1-3.md` (new)
+FILES CHANGED: This planning document and the Prisma schema were established during the design phase.
 DEFINITION OF DONE MET: YES
-NEXT PHASE: Phase 4 — Project Initialization
+NEXT PHASE: Phases 4–5 are documented in [Phase 4–5 Project Initialization and Authentication](Phase4-5%20Project%20Initialization%20and%20Authentication.md).
 WAITING FOR APPROVAL: YES
