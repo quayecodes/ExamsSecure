@@ -40,6 +40,17 @@ export async function GET() {
         title: true,
         course: { select: { id: true, name: true } },
         _count: { select: { questions: true } },
+        questions: {
+          orderBy: { prompt: "asc" },
+          select: {
+            id: true,
+            type: true,
+            prompt: true,
+            points: true,
+            correctAnswer: true,
+            options: { select: { id: true, optionText: true, isCorrect: true } },
+          },
+        },
       },
     }),
   ]);
