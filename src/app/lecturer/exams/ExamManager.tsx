@@ -1,6 +1,8 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import Link from "next/link";
+import type { Route } from "next";
 
 type Course = { id: string; name: string };
 type Question = { id: string; prompt: string; type: "MCQ" | "TRUE_FALSE" | "SHORT_ANSWER"; points: number };
@@ -95,7 +97,7 @@ export default function ExamManager() {
         {message && <p role="status" className="text-sm text-emerald-400">{message}</p>}{error && <p role="alert" className="text-sm text-red-400">{error}</p>}
         <button type="submit" disabled={isSubmitting || !courseQuestions.length} className="rounded-lg bg-emerald-500 px-4 py-2 font-semibold text-slate-950 disabled:opacity-50">{isSubmitting ? "Creating..." : "Create draft exam"}</button>
       </form>
-      <section aria-labelledby="exams-heading"><h2 id="exams-heading" className="text-xl font-semibold">Your exams</h2><p className="mt-2 text-sm text-slate-400">Drafts and scheduled exams for your courses.</p><div className="mt-5 space-y-3">{exams.length ? exams.map((exam) => <article key={exam.id} className="rounded-xl border border-slate-800 bg-slate-900 p-5"><h3 className="font-semibold">{exam.title}</h3><p className="mt-1 text-sm text-slate-400">{exam.course.name} · {exam._count.questions} questions · {exam.durationMinutes} minutes</p><p className="mt-2 text-xs uppercase tracking-wide text-emerald-400">{exam.status}</p></article>) : <p className="rounded-xl border border-dashed border-slate-800 p-5 text-sm text-slate-400">No exams created yet.</p>}</div></section>
+      <section aria-labelledby="exams-heading"><h2 id="exams-heading" className="text-xl font-semibold">Your exams</h2><p className="mt-2 text-sm text-slate-400">Drafts and scheduled exams for your courses.</p><div className="mt-5 space-y-3">{exams.length ? exams.map((exam) => <article key={exam.id} className="rounded-xl border border-slate-800 bg-slate-900 p-5"><h3 className="font-semibold">{exam.title}</h3><p className="mt-1 text-sm text-slate-400">{exam.course.name} · {exam._count.questions} questions · {exam.durationMinutes} minutes</p><p className="mt-2 text-xs uppercase tracking-wide text-emerald-400">{exam.status}</p><Link href={`/lecturer/exams/${exam.id}/assignments` as Route} className="mt-4 inline-block text-sm text-emerald-400">Assign students</Link></article>) : <p className="rounded-xl border border-dashed border-slate-800 p-5 text-sm text-slate-400">No exams created yet.</p>}</div></section>
     </div>
   );
 }

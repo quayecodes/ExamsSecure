@@ -51,6 +51,7 @@ model User {
   createdAt     DateTime     @default(now())
   coursesTaught Course[]     @relation("LecturerCourses")
   attempts      ExamAttempt[]
+  examAssignments ExamAssignment[]
 }
 
 model Course {
@@ -105,6 +106,19 @@ model Exam {
   status             ExamStatus   @default(DRAFT)
   questions          ExamQuestion[]
   attempts           ExamAttempt[]
+  assignments        ExamAssignment[]
+}
+
+model ExamAssignment {
+  id         String      @id @default(uuid())
+  examId     String
+  exam       Exam        @relation(fields: [examId], references: [id], onDelete: Cascade)
+  studentId  String
+  student    User        @relation(fields: [studentId], references: [id])
+  assignedAt DateTime    @default(now())
+
+  @@unique([examId, studentId])
+  @@index([studentId])
 }
 
 model ExamQuestion {
