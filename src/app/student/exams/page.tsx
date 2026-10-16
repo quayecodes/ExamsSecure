@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import WorkspaceShell from "@/components/WorkspaceShell";
 
 export default async function StudentExamsPage() {
   const session = await getServerSession(authOptions);
@@ -31,8 +32,8 @@ export default async function StudentExamsPage() {
     },
   });
 
-  return (
-    <main className="min-h-screen bg-slate-950 px-6 py-12 text-slate-50">
+  return <WorkspaceShell role="STUDENT">
+    <main className="px-4 py-10 sm:px-6 sm:py-12">
       <div className="mx-auto max-w-5xl">
         <p className="text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">Student workspace</p>
         <h1 className="mt-3 text-4xl font-bold tracking-tight">Assigned exams</h1>
@@ -42,5 +43,5 @@ export default async function StudentExamsPage() {
         </section>
       </div>
     </main>
-  );
+  </WorkspaceShell>;
 }
