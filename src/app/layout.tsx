@@ -2,8 +2,11 @@ import "./globals.css";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "ExamSecure",
-  description: "Secure online examination platform",
+  title: {
+    default: "ExamSecure",
+    template: "%s | ExamSecure",
+  },
+  description: "A secure online examination platform for institutions and educators.",
 };
 
 export default function RootLayout({

@@ -4,6 +4,13 @@
 
 :root {
   color-scheme: dark;
+  --ink: #f8fafc;
+  --muted: #94a3b8;
+  --surface: #0f172a;
+  --surface-raised: #111c31;
+  --border: #26344d;
+  --accent: #34d399;
+  --accent-strong: #10b981;
 }
 
 html,
@@ -15,9 +22,51 @@ body {
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  background-image: radial-gradient(circle at 15% 0%, rgba(16, 185, 129, 0.1), transparent 32rem), linear-gradient(145deg, #020617 0%, #07111f 55%, #0b1628 100%);
+  color: var(--ink);
 }
 
 * {
   box-sizing: border-box;
+}
+
+::selection {
+  background: rgba(52, 211, 153, 0.35);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  transition: border-color 160ms ease, background-color 160ms ease, opacity 160ms ease, transform 160ms ease;
+}
+
+button:not(:disabled):hover,
+a:hover {
+  opacity: 0.88;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }
