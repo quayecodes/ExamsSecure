@@ -2,7 +2,7 @@
 
 ExamSecure is a secure online examination platform for schools, universities, and training organizations. It is designed to reduce the administrative cost of paper-based examinations while treating authentication, authorization, exam timing, and auditability as first-class requirements.
 
-This portfolio project has completed Phases 1-5: requirements and planning, architecture, database design, project initialization, and authentication/RBAC. Core examination workflows are intentionally not implemented yet.
+This portfolio project has completed Phases 1-6: requirements and planning, architecture, database design, project initialization, authentication/RBAC, and the core examination workflow.
 
 ## Project goals
 
@@ -37,10 +37,17 @@ This portfolio project has completed Phases 1-5: requirements and planning, arch
 - Two-hour JWT sessions with role claims.
 - Server-side route protection for admin, lecturer, and student areas.
 - Manual authentication verification for registration, login, session claims, RBAC, and logout.
+- Lecturer question-bank and objective-question creation.
+- Draft exam creation with future scheduling and owned-question selection.
+- Exam assignment to institution students with duplicate protection.
+- Student exam access, one-time start, objective answer submission, and server-enforced deadlines.
+- Automatic objective grading and student/lecturer result views.
+- Integrity-event logging for tab switches, focus loss, and timeouts.
+- Manual runtime verification for the core Phase 6 workflows.
 
 ### Next
 
-Phase 6 begins with one approved core feature at a time. The planned order is question-bank management, exam creation and scheduling, exam-taking, grading, and results.
+Phase 7 is next: UI/UX refinement, accessibility review, responsive behavior, and consistent loading/error states. Phase 8 will add broader automated testing and security review.
 
 ## Local setup
 
@@ -123,6 +130,7 @@ Known risks and future hardening, including brute-force rate limiting and broade
 
 - [Requirements, architecture, and database design](docs/Phase1-3%20Requirements,Architecture,%20and%20Database%20Design.md)
 - [Project initialization and authentication](docs/Phase4-5%20Project%20Initialization%20and%20Authentication.md)
+- [Core application features](docs/Phase6%20Core%20Application%20Features.md)
 - [Development contract and phase rules](context.md)
 
 ## Git conventions
