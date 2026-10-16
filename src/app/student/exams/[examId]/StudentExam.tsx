@@ -49,7 +49,6 @@ export default function StudentExam({ examId }: { examId: string }) {
       if (!response.ok) throw new Error(result.error ?? "Unable to start exam.");
       setExam(result.data.exam);
       setAttempt(result.data.attempt);
-      if (result.data.attempt) setRemainingSeconds(getRemainingSeconds(result.data.attempt.startedAt, result.data.exam));
       setRemainingSeconds(getRemainingSeconds(result.data.attempt.startedAt, result.data.exam));
     } catch (startError) {
       setError(startError instanceof Error ? startError.message : "Unable to start exam.");
@@ -120,11 +119,32 @@ export default function StudentExam({ examId }: { examId: string }) {
   if (error && !exam) return <p role="alert" className="text-red-400">{error}</p>;
   if (!exam) return <p className="text-slate-400">Exam not found.</p>;
 
+  const isInProgress = attempt?.status === "IN_PROGRESS";
+  const timeLabel = `${Math.floor((remainingSeconds ?? 0) / 60)}:${String((remainingSeconds ?? 0) % 60).padStart(2, "0")}`;
+
   return (
-    <section>
-      <h1 className="text-4xl font-bold tracking-tight">{exam.title}</h1>
+    <section aria-labelledby="student-exam-heading">
+      <h1 id="student-exam-heading" className="text-3xl font-bold tracking-tight sm:text-4xl">{exam.title}</h1>
       <p className="mt-3 text-slate-400">{exam.course.name} · {exam.durationMinutes} minutes · {exam.questions.length} questions</p>
-      {!attempt ? <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-6"><p className="text-slate-300">Start this exam only when the scheduled window is open.</p><button type="button" onClick={startExam} disabled={isStarting} className="mt-5 rounded-lg bg-emerald-500 px-4 py-2 font-semibold text-slate-950 disabled:opacity-50">{isStarting ? "Starting..." : "Start exam"}</button></div> : <div className="mt-8 space-y-5"><div className="flex items-center justify-between rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-300"><span>{attempt.status === "IN_PROGRESS" ? `Time remaining: ${Math.floor((remainingSeconds ?? 0) / 60)}:${String((remainingSeconds ?? 0) % 60).padStart(2, "0")}` : `Attempt ${attempt.status.toLowerCase()}.`}</span>{attempt.status === "IN_PROGRESS" ? <button type="button" onClick={() => void submitAnswers()} disabled={isSubmitting} className="rounded-lg bg-emerald-500 px-3 py-2 font-semibold text-slate-950 disabled:opacity-50">{isSubmitting ? "Submitting..." : "Submit exam"}</button> : <Link href={`/student/exams/${exam.id}/results` as Route} className="text-emerald-300">View result</Link>}</div><ol className="space-y-4">{exam.questions.map(({ id, question }, index) => <li key={id} className="rounded-xl border border-slate-800 bg-slate-900 p-5"><p className="font-medium">{index + 1}. {question.prompt} <span className="text-slate-500">({question.points} pt)</span></p><div className="mt-3 space-y-2">{question.options.map((option) => <label key={option.id} className="flex gap-3 text-sm text-slate-300"><input type="radio" name={question.id} value={option.id} checked={answers[question.id] === option.id} onChange={() => updateAnswer(question.id, option.id)} disabled={attempt.status !== "IN_PROGRESS"} />{option.optionText}</label>)}</div></li>)}</ol></div>}
+      {!attempt ? (
+        <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-5 sm:p-6">
+          <p className="text-slate-300">Start this exam only when the scheduled window is open.</p>
+          <button type="button" onClick={startExam} disabled={isStarting} className="mt-5 min-h-11 rounded-lg bg-emerald-500 px-4 py-2.5 font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50">{isStarting ? "Starting..." : "Start exam"}</button>
+        </div>
+      ) : (
+        <div className="mt-8 space-y-5">
+          <div className="flex flex-col gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-300 sm:flex-row sm:items-center sm:justify-between">
+            <span role="timer" aria-live="polite" aria-atomic="true">{isInProgress ? `Time remaining: ${timeLabel}` : `Attempt ${attempt.status.toLowerCase()}.`}</span>
+            {isInProgress ? <button type="button" onClick={() => void submitAnswers()} disabled={isSubmitting} className="min-h-11 rounded-lg bg-emerald-500 px-3 py-2 font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50">{isSubmitting ? "Submitting..." : "Submit exam"}</button> : <Link href={`/student/exams/${exam.id}/results` as Route} className="min-h-11 rounded-lg px-3 py-2 font-medium text-emerald-300 hover:bg-emerald-500/10">View result</Link>}
+          </div>
+          <ol className="space-y-4" aria-label="Exam questions">
+            {exam.questions.map(({ id, question }, index) => {
+              const questionLabelId = `question-label-${question.id}`;
+              return <li key={id} className="rounded-xl border border-slate-800 bg-slate-900 p-5"><fieldset disabled={!isInProgress} aria-labelledby={questionLabelId}><legend id={questionLabelId} className="font-medium leading-6">{index + 1}. {question.prompt} <span className="text-slate-500">({question.points} pt)</span></legend><div className="mt-4 space-y-2">{question.options.map((option) => <label key={option.id} className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-slate-800 px-3 py-2 text-sm text-slate-300 hover:border-emerald-500/60 hover:bg-slate-800"><input type="radio" name={question.id} value={option.id} checked={answers[question.id] === option.id} onChange={() => updateAnswer(question.id, option.id)} />{option.optionText}</label>)}</div></fieldset></li>;
+            })}
+          </ol>
+        </div>
+      )}
       {error && <p role="alert" className="mt-4 text-sm text-red-400">{error}</p>}
     </section>
   );
