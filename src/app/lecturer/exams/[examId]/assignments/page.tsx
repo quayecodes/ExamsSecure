@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
+import WorkspaceShell from "@/components/WorkspaceShell";
 import AssignmentManager from "./AssignmentManager";
 
 export default async function ExamAssignmentsPage({ params }: { params: { examId: string } }) {
@@ -10,8 +11,8 @@ export default async function ExamAssignmentsPage({ params }: { params: { examId
     redirect("/unauthorized");
   }
 
-  return (
-    <main className="min-h-screen bg-slate-950 px-6 py-12 text-slate-50">
+  return <WorkspaceShell role="LECTURER">
+    <main className="px-4 py-10 sm:px-6 sm:py-12">
       <div className="mx-auto max-w-3xl">
         <p className="text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">Lecturer workspace</p>
         <h1 className="mt-3 text-4xl font-bold tracking-tight">Assign exam</h1>
@@ -19,5 +20,5 @@ export default async function ExamAssignmentsPage({ params }: { params: { examId
         <div className="mt-10"><AssignmentManager examId={params.examId} /></div>
       </div>
     </main>
-  );
+  </WorkspaceShell>;
 }

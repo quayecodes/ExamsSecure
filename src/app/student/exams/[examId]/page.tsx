@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
+import WorkspaceShell from "@/components/WorkspaceShell";
 import StudentExam from "./StudentExam";
 
 export default async function StudentExamPage({ params }: { params: { examId: string } }) {
@@ -10,12 +11,12 @@ export default async function StudentExamPage({ params }: { params: { examId: st
     redirect("/unauthorized");
   }
 
-  return (
-    <main className="min-h-screen bg-slate-950 px-6 py-12 text-slate-50">
+  return <WorkspaceShell role="STUDENT">
+    <main className="px-4 py-10 sm:px-6 sm:py-12">
       <div className="mx-auto max-w-4xl">
         <p className="text-sm font-medium uppercase tracking-[0.2em] text-emerald-400">Student workspace</p>
         <div className="mt-3"><StudentExam examId={params.examId} /></div>
       </div>
     </main>
-  );
+  </WorkspaceShell>;
 }
