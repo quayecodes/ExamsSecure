@@ -27,6 +27,7 @@ export async function GET(
           status: true,
           submittedAt: true,
           student: { select: { fullName: true, email: true } },
+          _count: { select: { integrityEvents: true } },
         },
       },
     },

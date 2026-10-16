@@ -86,13 +86,35 @@ export default function StudentExam({ examId }: { examId: string }) {
 
   useEffect(() => {
     if (!attempt || !exam || attempt.status !== "IN_PROGRESS") return;
+    const logIntegrityEvent = (eventType: "TAB_SWITCH" | "FOCUS_LOSS" | "TIME_OUT") => {
+      void fetch(`/api/student/exams/${examId}/integrity-events`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ eventType }),
+        keepalive: true,
+      });
+    };
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") logIntegrityEvent("TAB_SWITCH");
+    };
+    const handleWindowBlur = () => logIntegrityEvent("FOCUS_LOSS");
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("blur", handleWindowBlur);
     const timer = window.setInterval(() => {
       const remaining = getRemainingSeconds(attempt.startedAt, exam);
       setRemainingSeconds(remaining);
-      if (remaining === 0) void submitAnswers();
+      if (remaining === 0) {
+        logIntegrityEvent("TIME_OUT");
+        void submitAnswers();
+      }
     }, 1000);
-    return () => window.clearInterval(timer);
-  }, [attempt, exam, submitAnswers]);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("blur", handleWindowBlur);
+      window.clearInterval(timer);
+    };
+  }, [attempt, exam, examId, submitAnswers]);
 
   if (isLoading) return <p className="text-slate-400">Loading exam...</p>;
   if (error && !exam) return <p role="alert" className="text-red-400">{error}</p>;
